@@ -1,0 +1,33 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd /home/ubuntu/scritique-backend || mkdir -p /home/ubuntu/scritique-backend && cd /home/ubuntu/scritique-backend
+          git pull origin main || git clone https://github.com/scritique/scritique-backend.git .
+          npm ci || npm install
+          # If you use environment variables, copy or update your .env file here
+          pm2 restart scritique-backend || pm2 start npm --name "scritique-backend" -- start
+          # If not using pm2, use your actual start command (e.g., node index.js or npm start)
