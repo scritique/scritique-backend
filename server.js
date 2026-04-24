@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const emailRoutes = require('./routes/emailRoutes');
+const blogRoutes = require('./routes/blogRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // API routes
 app.use('/api', emailRoutes);
+app.use('/api/blogs', blogRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
